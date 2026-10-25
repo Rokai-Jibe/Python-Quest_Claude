@@ -2,40 +2,34 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#14101f">
-<link rel="manifest" href="manifest.json">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#1b1f2a">
 <title>Python Quest</title>
+<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div id="loading"><div class="spinner"></div><p id="loading-text">Chargement…</p></div>
-<div id="error-screen" hidden><h2>Erreur</h2><pre id="error-text"></pre></div>
-<div id="app" hidden>
-  <div id="hud"><span id="hud-map"></span><span id="hud-stats"></span></div>
-  <canvas id="world"></canvas>
-  <div id="dialog" hidden><div id="dialog-name"></div><div id="dialog-text"></div><button id="dialog-ok" type="button">OK</button></div>
-  <div id="controls">
-    <div id="dpad">
-      <button data-dir="up" type="button" aria-label="Haut">▲</button>
-      <button data-dir="left" type="button" aria-label="Gauche">◀</button>
-      <button data-dir="right" type="button" aria-label="Droite">▶</button>
-      <button data-dir="down" type="button" aria-label="Bas">▼</button>
-    </div>
-    <div id="actions">
-      <button id="btn-b" type="button">B</button>
-      <button id="btn-a" type="button">A</button>
-    </div>
+<div id="app">
+  <header id="hud">
+    <span id="hud-map"></span>
+    <span id="hud-hp"></span>
+    <span id="hud-gold"></span>
+  </header>
+  <pre id="screen" aria-label="carte"></pre>
+  <div id="dialog" class="hidden"><p id="dialog-text"></p><button id="dialog-ok">OK</button></div>
+  <div id="menu" class="hidden"></div>
+  <div id="touch">
+    <button data-dir="up">&#8593;</button>
+    <div><button data-dir="left">&#8592;</button><button data-dir="down">&#8595;</button><button data-dir="right">&#8594;</button></div>
+    <button id="touch-act">A</button>
   </div>
+  <p id="error"></p>
 </div>
-<script>
-window.onerror=function(m,s,l,c,e){var el=document.getElementById('error-screen');document.getElementById('error-text').textContent=m+'\n'+s+':'+l+':'+c+'\n'+(e&&e.stack?e.stack:'');el.hidden=false;};
-window.addEventListener('unhandledrejection',function(ev){window.onerror('Promise: '+(ev.reason&&ev.reason.message||ev.reason),'',0,0,ev.reason);});
-</script>
 <script src="js/i18n.js"></script>
 <script src="js/state.js"></script>
 <script src="js/data-maps.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/combat.js"></script>
 <script src="js/engine.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/main.js"></script>

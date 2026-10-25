@@ -1,290 +1,137 @@
-(function(){
-  // Légende : # mur, . sol, , haute herbe, T arbre, D porte, S panneau, ~ eau(bloquant), p chemin
-  // k coffre, L porte verrouillée, C porte à code, B bloc poussable, P plaque, F torche, ^ piques, X boss, x mini-boss, u escalier/sortie
-  // Les PNJ/panneaux/coffres sont des objets avec x,y.
-  var maps={
-    village:{name:'map.village',rows:[
-      '########################',
-      '#......................#',
-      '#.HH....HH....HH.......#',
-      '#.HH....HH....HH.......#',
-      '#.D1....D2....D3.......#',
-      '#......................#',
-      '#..S........S..........#',
-      '#......................#',
-      '#.HH.......HH..........#',
-      '#.HH.......HH..........#',
-      '#.D4.......D5..........#',
-      '#......................#',
-      '#......................p',
-      '########################'
-    ],spawn:{x:10,y:6},
-    links:[
-      {x:2,y:4,to:'house1',tx:3,ty:5},
-      {x:9,y:4,to:'house2',tx:3,ty:5},
-      {x:16,y:4,to:'house3',tx:3,ty:5},
-      {x:2,y:10,to:'house4',tx:3,ty:5},
-      {x:12,y:10,to:'shop',tx:3,ty:5},
-      {x:23,y:12,to:'forest',tx:1,ty:7,gate:'village_exit'}
-    ],npcs:[
-      {x:12,y:6,id:'mentor',name:'npc.mentor.name',pages:['npc.mentor.1','npc.mentor.2','npc.mentor.3'],teach:'variables',quest:'q_first'},
-      {x:5,y:6,id:'sign_v',name:'',pages:['sign.village'],sign:true},
-      {x:8,y:7,id:'healer',name:'npc.healer.name',pages:['npc.healer.1'],heal:true},
-      {x:18,y:6,id:'guard1',name:'npc.guard1.name',pages:['npc.guard1.1'],guard:'village_exit',guardX:22,guardY:12},
-      {x:15,y:8,id:'kid',name:'npc.kid.name',pages:['npc.kid.1','npc.kid.2'],teach:'print'},
-      {x:20,y:3,id:'sign_inc',name:'',pages:['sign.inc.1','sign.inc.2','sign.inc.3'],sign:true,teach:'increment'}
-    ],chests:[
-      {x:21,y:9,id:'c_village',gold:15,item:'potion'}
-    ]},
+// Python Quest — définition des cartes, portes, PNJ et enseignements
+window.PQ = window.PQ || {};
+PQ.MAPS = {
+  village: {
+    title: 'map.village', music: null,
+    // # = arbre, ~ = eau, . = sol, = = chemin, = = maison(toit), d = porte, c = comptoir, s = panneau
+    rows: [
+      '###########.##########',
+      '#....=====....=======.#',
+      '#.T..=...=...=.....=..#',
+      '#.T..=.d.=...=.ddd.=..#',
+      '#....=====...=====d==.#',
+      '#.......s...........==#',
+      '#..................==.#',
+      '#..T........~~~....==.#',
+      '#..T........~~~....===d',
+      '#...........s.........#',
+      '#########.############'
+    ],
+    legend: { '.': 'grass', '=': 'path', '#': 'tree', 'T': 'tree', '~': 'water', 'd': 'door' },
+    walkable: '.=~',
+    doors: [
+      { x: 5, y: 3, to: 'house1', tx: 3, ty: 2 },
+      { x: 9, y: 3, to: 'shop', tx: 3, ty: 2 },
+      { x: 15, y: 3, to: 'house2', tx: 3, ty: 2 },
+      { x: 19, y: 3, to: 'shop', tx: 3, ty: 2 },
+      { x: 19, y: 4, to: 'house2', tx: 3, ty: 2 },
+      { x: 22, y: 8, to: 'forest', tx: 2, ty: 8 }
+    ],
+    npcs: [
+      { id: 'mage', ch: 'M', x: 12, y: 5, lines: ['npc.mage1', 'npc.mage2'], spell: 'print("Bonjour !")' },
+      { id: 'cat', ch: 'c', x: 7, y: 7, lines: ['npc.cat1'] },
+      { id: 'merchant', ch: '$', x: 17, y: 7, lines: ['npc.merchant1'] },
+      { id: 'vsign', ch: 's', x: 9, y: 5, lines: ['sign.village'] },
+      { id: 'vsign2', ch: 's', x: 9, y: 9, lines: ['sign.village'] }
+    ],
+    enemies: null
+  },
+  house1: {
+    title: 'map.house1',
+    rows: [
+      '#######',
+      '#.....#',
+      '#.....#',
+      '#.....#',
+      '#.....#',
+      '#.....4',
+      '#######'
+    ],
+    legend: { '.': 'floor', '#': 'wall', '4': 'exit' },
+    walkable: '.4',
+    doors: [{ x: 5, y: 5, to: 'village', tx: 5, ty: 4 }],
+    npcs: [{ id: 'mage', ch: 'M', x: 3, y: 2, lines: ['npc.mage1', 'npc.mage2'], spell: 'print("Bonjour !")' }],
+    enemies: null
+  },
+  house2: {
+    title: 'map.house2',
+    rows: [
+      '#######',
+      '#.....#',
+      '#.....#',
+      '#.....#',
+      '#.....#',
+      '#.....#',
+      '#######'
+    ],
+    legend: { '.': 'floor', '#': 'wall' },
+    walkable: '.',
+    doors: [{ x: 3, y: 5, to: 'village', tx: 15, ty: 4 }],
+    npcs: [{ id: 'smith', ch: 'S', x: 3, y: 2, lines: ['npc.smith1'] }],
+    enemies: null
+  },
+  shop: {
+    title: 'map.shop',
+    rows: [
+      '#######',
+      '#.....#',
+      '#..c..#',
+      '#.....#',
+      '#.....#',
+      '#.....5',
+      '#######'
+    ],
+    legend: { '.': 'floor', '#': 'wall', 'c': 'counter', '5': 'exit' },
+    walkable: '.5',
+    doors: [{ x: 5, y: 5, to: 'village', tx: 9, ty: 4 }],
+    npcs: [{ id: 'shopkeeper', ch: 'K', x: 3, y: 1, lines: ['npc.shopkeeper1'], shop: true }],
+    enemies: null
+  },
+  forest: {
+    title: 'map.forest',
+    rows: [
+      '########4###',
+      '#....T.....#',
+      '#..T....T..#',
+      '#.....T....#',
+      '#.T........#',
+      '#4.........3',
+      '#....T...T.#',
+      '#.........3',
+      '4..........3'
+    ],
+    legend: { '.': 'grass', '#': 'tree', 'T': 'tree', '3': 'door', '4': 'door' },
+    walkable: '.34',
+    doors: [
+      { x: 2, y: 8, to: 'village', tx: 21, ty: 8 },
+      { x: 0, y: 8, to: 'village', tx: 21, ty: 8 },
+      { x: 0, y: 5, to: 'village', tx: 21, ty: 8 },
+      { x: 7, y: 0, to: 'dungeon', tx: 3, ty: 2 }
+    ],
+    npcs: [{ id: 'fsign', ch: 's', x: 9, y: 5, lines: ['sign.forest'] }],
+    enemies: [{ id: 'snake', ch: '~', rate: 0.25 }, { id: 'slime', ch: 'o', rate: 0.15 }]
+  },
+  dungeon: {
+    title: 'map.dungeon',
+    rows: [
+      '########7',
+      '#......#',
+      '#..##..#',
+      '#......#',
+      '#..##..#',
+      '#......#',
+      '########'
+    ],
+    legend: { '.': 'cave', '#': 'wall', '7': 'exit' },
+    walkable: '.7',
+    doors: [{ x: 0, y: 0, to: 'forest', tx: 7, ty: 1 }],
+    npcs: [],
+    enemies: [{ id: 'snake', ch: '~', rate: 0.3 }, { id: 'guardian', ch: 'G', rate: 0.2 }]
+  }
+};
 
-    house1:{name:'map.house1',rows:[
-      '#######','#.....#','#.....#','#.....#','#.....#','#..u..#','#######'
-    ],spawn:{x:3,y:4},links:[{x:3,y:5,to:'village',tx:2,ty:5}],npcs:[
-      {x:2,y:2,id:'h1_npc',name:'npc.h1.name',pages:['npc.h1.1','npc.h1.2','npc.h1.3'],teach:'types',quest:'q_amulet'}
-    ],chests:[{x:5,y:2,id:'c_h1',gold:10,item:'antidote'}]},
-    house2:{name:'map.house2',rows:[
-      '#######','#.....#','#.....#','#.....#','#.....#','#..u..#','#######'
-    ],spawn:{x:3,y:4},links:[{x:3,y:5,to:'village',tx:9,ty:5}],npcs:[
-      {x:4,y:2,id:'h2_npc',name:'npc.h2.name',pages:['npc.h2.1','npc.h2.2','npc.h2.3'],teach:'strings'}
-    ],chests:[{x:1,y:1,id:'c_h2',gold:0,item:'hint'}]},
-    house3:{name:'map.house3',rows:[
-      '#######','#.....#','#.....#','#.....#','#.....#','#..u..#','#######'
-    ],spawn:{x:3,y:4},links:[{x:3,y:5,to:'village',tx:16,ty:5}],npcs:[
-      {x:3,y:2,id:'h3_npc',name:'npc.h3.name',pages:['npc.h3.1','npc.h3.2','npc.h3.3'],teach:'operators',quest:'q_script'}
-    ],chests:[{x:5,y:4,id:'c_h3',gold:20,item:null}]},
-    house4:{name:'map.house4',rows:[
-      '#######','#.....#','#.....#','#.....#','#.....#','#..u..#','#######'
-    ],spawn:{x:3,y:4},links:[{x:3,y:5,to:'village',tx:2,ty:11}],npcs:[
-      {x:3,y:2,id:'h4_npc',name:'npc.h4.name',pages:['npc.h4.1','npc.h4.2','npc.h4.3'],teach:'input'},
-      {x:1,y:3,id:'book_g',name:'npc.book.name',pages:['npc.book.1'],book:true}
-    ],chests:[{x:5,y:1,id:'c_h4',gold:0,item:'wand2'}]},
-    shop:{name:'map.shop',rows:[
-      '#######','#.....#','#.....#','#.....#','#.....#','#..u..#','#######'
-    ],spawn:{x:3,y:4},links:[{x:3,y:5,to:'village',tx:12,ty:11}],npcs:[
-      {x:3,y:2,id:'shopkeeper',name:'npc.shop.name',pages:['npc.shop.1'],shop:true}
-    ],chests:[]},
-
-    forest:{name:'map.forest',rows:[
-      'TTTTTTTTTTTTTTTTTTTTTTTTTTTT',
-      'T,,,..TT....,,,,,...TT....uT',
-      'T,,,..TT....,,,,,...TT.....T',
-      'T.....TT.....,,,....TT..,,.T',
-      'T..TT.......TT.......TT.,,.T',
-      'T..TT..,,,..TT..,,,...TT...T',
-      'T......,,,.......,,,.......T',
-      'p.....................,,...T',
-      'T..,,,..TT.....TT.....,,...T',
-      'T..,,,..TT.....TT..........T',
-      'T.......TT..,,,.TT...TT....T',
-      'T..TT.......,,,......TT..,,T',
-      'T..TT.....................T',
-      'TTTTTTTTTTTTTTTTTTTTTTTTTTTT'
-    ],spawn:{x:1,y:7},grass:{enc:['slime','goblin','wolf'],rate:0.18},
-    links:[
-      {x:0,y:7,to:'village',tx:22,ty:12},
-      {x:26,y:1,to:'dungeon1_a',tx:3,ty:6,gate:'forest_dungeon'},
-      {x:27,y:7,to:'plains',tx:1,ty:7,gate:'boss1'}
-    ],npcs:[
-      {x:4,y:7,id:'trav1',name:'npc.trav1.name',pages:['npc.trav1.1','npc.trav1.2','npc.trav1.3'],teach:'conditions'},
-      {x:14,y:6,id:'trav2',name:'npc.trav2.name',pages:['npc.trav2.1','npc.trav2.2','npc.trav2.3'],teach:'lists',quest:'q_slime'},
-      {x:20,y:4,id:'sign_f',name:'',pages:['sign.forest.1'],sign:true},
-      {x:25,y:7,id:'guard2',name:'npc.guard2.name',pages:['npc.guard2.1'],guard:'boss1',guardX:26,guardY:7},
-      {x:22,y:2,id:'trav3',name:'npc.trav3.name',pages:['npc.trav3.1','npc.trav3.2','npc.trav3.3'],teach:'booleans'}
-    ],chests:[
-      {x:2,y:2,id:'c_f1',gold:25,item:'potion'},
-      {x:25,y:11,id:'c_f2',gold:0,item:'amulet'},
-      {x:10,y:12,id:'c_f3',gold:30,item:null}
-    ],trainers:[
-      {x:17,y:10,id:'t_f1',creature:'goblin',pages:['trainer.f1']}
-    ]},
-
-    plains:{name:'map.plains',rows:[
-      'TTTTTTTTTTTTTTTTTTTTTTTTTTTT',
-      'T.........................uT',
-      'T..,,,...HH......,,,......T',
-      'T..,,,...HH......,,,..TT..T',
-      'T........D1...............T',
-      'T.....................,,..T',
-      'T..TT.........TT......,,..T',
-      'p..TT.........TT..........T',
-      'T.....,,,.................T',
-      'T.....,,,......,,,..TT....T',
-      'T..............,,,..TT....T',
-      'T.........................T',
-      'TTTTTTTTTTTTTTTTTTTTTTTTTTTT'
-    ],spawn:{x:1,y:7},grass:{enc:['bat','snake','imp'],rate:0.18},
-    links:[
-      {x:0,y:7,to:'forest',tx:26,ty:7},
-      {x:10,y:4,to:'plains_house',tx:3,ty:5},
-      {x:26,y:1,to:'dungeon2_a',tx:3,ty:6,gate:'plains_dungeon'},
-      {x:27,y:7,to:'mountain',tx:1,ty:7,gate:'boss2'}
-    ],npcs:[
-      {x:6,y:5,id:'pl1',name:'npc.pl1.name',pages:['npc.pl1.1','npc.pl1.2','npc.pl1.3'],teach:'elif'},
-      {x:16,y:7,id:'pl2',name:'npc.pl2.name',pages:['npc.pl2.1','npc.pl2.2','npc.pl2.3'],teach:'comparison'},
-      {x:12,y:2,id:'sign_p',name:'',pages:['sign.plains.1'],sign:true},
-      {x:25,y:7,id:'guard3',name:'npc.guard3.name',pages:['npc.guard3.1'],guard:'boss2',guardX:26,guardY:7}
-    ],chests:[
-      {x:3,y:11,id:'c_p1',gold:35,item:'potion'},
-      {x:22,y:10,id:'c_p2',gold:0,item:'wand3'}
-    ],trainers:[
-      {x:19,y:5,id:'t_p1',creature:'imp',pages:['trainer.p1']}
-    ]},
-    plains_house:{name:'map.plains_house',rows:[
-      '#######','#.....#','#.....#','#.....#','#.....#','#..u..#','#######'
-    ],spawn:{x:3,y:4},links:[{x:3,y:5,to:'plains',tx:10,ty:5}],npcs:[
-      {x:3,y:2,id:'ph_npc',name:'npc.ph.name',pages:['npc.ph.1','npc.ph.2','npc.ph.3'],teach:'tryexcept'}
-    ],chests:[{x:5,y:1,id:'c_ph',gold:20,item:'hint'}]},
-
-    mountain:{name:'map.mountain',rows:[
-      'TTTTTTTTTTTTTTTTTTTTTTTTTTTT',
-      'T..........TT.............uT',
-      'T..,,,.....TT.....,,,......T',
-      'T..,,,.............,,,..TT.T',
-      'T......TT..........TT..TT.T',
-      'T......TT...,,,....TT.....T',
-      'T...........,,,...........T',
-      'p.........................T',
-      'T..TT.....................T',
-      'T..TT.....,,,.....TT......T',
-      'T.........,,,.....TT..D...T',
-      'T.........................T',
-      'TTTTTTTTTTTTTTTTTTTTTTTTTTTT'
-    ],spawn:{x:1,y:7},grass:{enc:['bat','golem','imp'],rate:0.2},
-    links:[
-      {x:0,y:7,to:'plains',tx:26,ty:7},
-      {x:26,y:1,to:'dungeon3_a',tx:3,ty:6,gate:'mountain_dungeon'},
-      {x:22,y:10,to:'cave_shop',tx:3,ty:5},
-      {x:27,y:7,to:'citadel',tx:1,ty:7,gate:'boss3'}
-    ],npcs:[
-      {x:6,y:6,id:'mt1',name:'npc.mt1.name',pages:['npc.mt1.1','npc.mt1.2','npc.mt1.3'],teach:'for'},
-      {x:14,y:7,id:'mt2',name:'npc.mt2.name',pages:['npc.mt2.1','npc.mt2.2','npc.mt2.3'],teach:'while'},
-      {x:10,y:3,id:'mt3',name:'npc.mt3.name',pages:['npc.mt3.1','npc.mt3.2','npc.mt3.3'],teach:'breakcontinue'},
-      {x:20,y:7,id:'mt4',name:'npc.mt4.name',pages:['npc.mt4.1','npc.mt4.2','npc.mt4.3'],teach:'tuples'},
-      {x:25,y:7,id:'guard4',name:'npc.guard4.name',pages:['npc.guard4.1'],guard:'boss3',guardX:26,guardY:7}
-    ],chests:[
-      {x:2,y:11,id:'c_m1',gold:50,item:'potion'}
-    ],trainers:[
-      {x:16,y:4,id:'t_m1',creature:'golem',pages:['trainer.m1']}
-    ]},
-    cave_shop:{name:'map.cave_shop',rows:[
-      '#######','#.....#','#.....#','#.....#','#.....#','#..u..#','#######'
-    ],spawn:{x:3,y:4},links:[{x:3,y:5,to:'mountain',tx:22,ty:11}],npcs:[
-      {x:3,y:2,id:'cave_keeper',name:'npc.cave.name',pages:['npc.cave.1'],shop:true,shop2:true}
-    ],chests:[]},
-
-    citadel:{name:'map.citadel',rows:[
-      '########################',
-      '#......................#',
-      '#..,,,..........,,,....#',
-      '#..,,,..........,,,....#',
-      '#......................#',
-      '#..TT..............TT..#',
-      '#......................#',
-      'p......................#',
-      '#..,,,..........,,,....#',
-      '#..,,,.......U..,,,....#',
-      '#......................#',
-      '########################'
-    ],spawn:{x:1,y:7},grass:{enc:['recursion','dict','ai'],rate:0.2},
-    links:[
-      {x:0,y:7,to:'mountain',tx:26,ty:7},
-      {x:13,y:9,to:'dungeon4_a',tx:3,ty:6,gate:'citadel_dungeon'}
-    ],npcs:[
-      {x:6,y:4,id:'ct1',name:'npc.ct1.name',pages:['npc.ct1.1','npc.ct1.2','npc.ct1.3'],teach:'functions'},
-      {x:10,y:6,id:'ct2',name:'npc.ct2.name',pages:['npc.ct2.1','npc.ct2.2','npc.ct2.3'],teach:'dicts'},
-      {x:16,y:6,id:'ct3',name:'npc.ct3.name',pages:['npc.ct3.1','npc.ct3.2','npc.ct3.3'],teach:'files'},
-      {x:20,y:4,id:'ct4',name:'npc.ct4.name',pages:['npc.ct4.1','npc.ct4.2','npc.ct4.3'],teach:'comprehensions'},
-      {x:4,y:10,id:'ct5',name:'npc.ct5.name',pages:['npc.ct5.1','npc.ct5.2','npc.ct5.3'],teach:'classes'},
-      {x:18,y:10,id:'ct6',name:'npc.ct6.name',pages:['npc.ct6.1','npc.ct6.2','npc.ct6.3'],teach:'data'},
-      {x:8,y:2,id:'ct7',name:'npc.ct7.name',pages:['npc.ct7.1','npc.ct7.2','npc.ct7.3'],teach:'ai'},
-      {x:12,y:2,id:'ct8',name:'npc.ct8.name',pages:['npc.ct8.1','npc.ct8.2','npc.ct8.3'],teach:'modules'}
-    ],chests:[{x:21,y:1,id:'c_c1',gold:100,item:'wand4'}]},
-
-    // ---------- Donjon 1 : Crypte des Variables ----------
-    dungeon1_a:{name:'map.dungeon1',dungeon:1,rows:[
-      '#########','#.......#','#.k...^.#','#.......#','#...B...#','#.......#','#...u...#','#########'
-    ],spawn:{x:3,y:5},links:[
-      {x:3,y:6,to:'forest',tx:26,ty:2},
-      {x:4,y:0,to:'dungeon1_b',tx:4,ty:5,door:'L1'}
-    ],doors:[{x:4,y:0,type:'lock',key:'key_d1',id:'L1'}],
-    chests:[{x:2,y:2,id:'d1a_c',gold:20,item:'key_d1'}],npcs:[
-      {x:6,y:3,id:'d1_hint',name:'npc.d1hint.name',pages:['npc.d1hint.1'],sign:true}
-    ],traps:[{x:6,y:2}],pushables:[{x:4,y:4}]},
-    dungeon1_b:{name:'map.dungeon1',dungeon:1,rows:[
-      '#########','#.......#','#.F...F.#','#.......#','#.......#','#...u...#','#########'
-    ],spawn:{x:4,y:4},links:[
-      {x:4,y:5,to:'dungeon1_a',tx:4,ty:1},
-      {x:4,y:0,to:'dungeon1_boss',tx:4,ty:5,door:'C1'}
-    ],doors:[{x:4,y:0,type:'code',id:'C1',code:'42',question:'d1_code'}],
-    chests:[{x:7,y:3,id:'d1b_c',gold:30,item:'potion'}],npcs:[],
-    torches:[{x:2,y:2},{x:6,y:2}],miniboss:{x:4,y:2,id:'mb1',creature:'goblin',pages:['trainer.mb1']}},
-    dungeon1_boss:{name:'map.dungeon1',dungeon:1,rows:[
-      '#########','#.......#','#.......#','#...X...#','#.......#','#...u...#','#########'
-    ],spawn:{x:4,y:4},links:[{x:4,y:5,to:'dungeon1_b',tx:4,ty:1}],npcs:[],chests:[],
-    boss:{x:4,y:3,id:'boss1',creature:'boss_var',pages:['boss.d1.intro']}},
-
-    // ---------- Donjon 2 : Labyrinthe des Conditions ----------
-    dungeon2_a:{name:'map.dungeon2',dungeon:2,rows:[
-      '#########','#.......#','#.k...^.#','#.......#','#...B...#','#.......#','#...u...#','#########'
-    ],spawn:{x:3,y:5},links:[
-      {x:3,y:6,to:'plains',tx:26,ty:2},
-      {x:4,y:0,to:'dungeon2_b',tx:4,ty:5,door:'L2'}
-    ],doors:[{x:4,y:0,type:'lock',key:'key_d2',id:'L2'}],
-    chests:[{x:2,y:2,id:'d2a_c',gold:30,item:'key_d2'}],npcs:[],traps:[{x:6,y:2}],pushables:[{x:4,y:4}]},
-    dungeon2_b:{name:'map.dungeon2',dungeon:2,rows:[
-      '#########','#.......#','#.F...F.#','#.......#','#.......#','#...u...#','#########'
-    ],spawn:{x:4,y:4},links:[
-      {x:4,y:5,to:'dungeon2_a',tx:4,ty:1},
-      {x:4,y:0,to:'dungeon2_boss',tx:4,ty:5,door:'C2'}
-    ],doors:[{x:4,y:0,type:'code',id:'C2',code:'7',question:'d2_code'}],
-    chests:[{x:7,y:3,id:'d2b_c',gold:40,item:'potion'}],npcs:[],
-    torches:[{x:2,y:2},{x:6,y:2}],miniboss:{x:4,y:2,id:'mb2',creature:'imp',pages:['trainer.mb2']}},
-    dungeon2_boss:{name:'map.dungeon2',dungeon:2,rows:[
-      '#########','#.......#','#.......#','#...X...#','#.......#','#...u...#','#########'
-    ],spawn:{x:4,y:4},links:[{x:4,y:5,to:'dungeon2_b',tx:4,ty:1}],npcs:[],chests:[],
-    boss:{x:4,y:3,id:'boss2',creature:'boss_cond',pages:['boss.d2.intro']}},
-
-    // ---------- Donjon 3 : Tour des Boucles ----------
-    dungeon3_a:{name:'map.dungeon3',dungeon:3,rows:[
-      '#########','#.......#','#.k...^.#','#.......#','#...B...#','#.......#','#...u...#','#########'
-    ],spawn:{x:3,y:5},links:[
-      {x:3,y:6,to:'mountain',tx:26,ty:2},
-      {x:4,y:0,to:'dungeon3_b',tx:4,ty:5,door:'L3'}
-    ],doors:[{x:4,y:0,type:'lock',key:'key_d3',id:'L3'}],
-    chests:[{x:2,y:2,id:'d3a_c',gold:40,item:'key_d3'}],npcs:[],traps:[{x:6,y:2}],pushables:[{x:4,y:4}]},
-    dungeon3_b:{name:'map.dungeon3',dungeon:3,rows:[
-      '#########','#.......#','#.F...F.#','#.......#','#.......#','#...u...#','#########'
-    ],spawn:{x:4,y:4},links:[
-      {x:4,y:5,to:'dungeon3_a',tx:4,ty:1},
-      {x:4,y:0,to:'dungeon3_boss',tx:4,ty:5,door:'C3'}
-    ],doors:[{x:4,y:0,type:'code',id:'C3',code:'10',question:'d3_code'}],
-    chests:[{x:7,y:3,id:'d3b_c',gold:50,item:'potion'}],npcs:[],
-    torches:[{x:2,y:2},{x:6,y:2}],miniboss:{x:4,y:2,id:'mb3',creature:'golem',pages:['trainer.mb3']}},
-    dungeon3_boss:{name:'map.dungeon3',dungeon:3,rows:[
-      '#########','#.......#','#.......#','#...X...#','#.......#','#...u...#','#########'
-    ],spawn:{x:4,y:4},links:[{x:4,y:5,to:'dungeon3_b',tx:4,ty:1}],npcs:[],chests:[],
-    boss:{x:4,y:3,id:'boss3',creature:'boss_loop',pages:['boss.d3.intro']}},
-
-    // ---------- Donjon 4 : Citadelle des Fonctions ----------
-    dungeon4_a:{name:'map.dungeon4',dungeon:4,rows:[
-      '#########','#.......#','#.k...^.#','#.......#','#...B...#','#.......#','#...u...#','#########'
-    ],spawn:{x:3,y:5},links:[
-      {x:3,y:6,to:'citadel',tx:13,ty:8},
-      {x:4,y:0,to:'dungeon4_b',tx:4,ty:5,door:'L4'}
-    ],doors:[{x:4,y:0,type:'lock',key:'key_d4',id:'L4'}],
-    chests:[{x:2,y:2,id:'d4a_c',gold:60,item:'key_d4'}],npcs:[],traps:[{x:6,y:2}],pushables:[{x:4,y:4}]},
-    dungeon4_b:{name:'map.dungeon4',dungeon:4,rows:[
-      '#########','#.......#','#.F...F.#','#.......#','#.......#','#...u...#','#########'
-    ],spawn:{x:4,y:4},links:[
-      {x:4,y:5,to:'dungeon4_a',tx:4,ty:1},
-      {x:4,y:0,to:'dungeon4_boss',tx:4,ty:5,door:'C4'}
-    ],doors:[{x:4,y:0,type:'code',id:'C4',code:'15',question:'d4_code'}],
-    chests:[{x:7,y:3,id:'d4b_c',gold:80,item:'potion'}],npcs:[],
-    torches:[{x:2,y:2},{x:6,y:2}],miniboss:{x:4,y:2,id:'mb4',creature:'dict',pages:['trainer.mb4']}},
-    dungeon4_boss:{name:'map.dungeon4',dungeon:4,rows:[
-      '#########','#.......#','#.......#','#...X...#','#.......#','#...u...#','#########'
-    ],spawn:{x:4,y:4},links:[{x:4,y:5,to:'dungeon4_b',tx:4,ty:1}],npcs:[],chests:[],
-    boss:{x:4,y:3,id:'boss4',creature:'boss_final',pages:['boss.d4.intro']}}
-  };
-  window.Maps=maps;
-})();
+PQ.ENEMIES = {
+  snake: { key: 'enemy.snake', hp: 18, dmg: 5, gold: 6, xp: 10, tier: 1 },
+  slime: { key: 'enemy.slime', hp: 12, dmg: 4, gold: 4, xp: 8, tier: 1 },
+  guardian: { key: 'enemy.guardian', hp: 30, dmg: 8, gold: 20, xp: 30, tier: 2 }
+};

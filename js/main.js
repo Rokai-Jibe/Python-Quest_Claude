@@ -1,33 +1,39 @@
-(function(){
-  function bindControls(){
-    var keys={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',z:'up',s:'down',q:'left',d:'right',w:'up',a:'left'};
-    window.addEventListener('keydown',function(e){
-      var k=e.key;
-      if(k===' '||k==='Enter'||k==='e'||k==='E'){e.preventDefault();Engine.interact();return;}
-      var dir=keys[k]||keys[(k||'').toLowerCase()];
-      if(dir&&!(k==='a'||k==='A')){e.preventDefault();Engine.move(dir);}
-      else if(k==='a'||k==='A'){e.preventDefault();Engine.interact();}
-    });
-    var btns=document.querySelectorAll('#dpad button');
-    for(var i=0;i<btns.length;i++){(function(b){
-      var t=null;
-      function go(ev){ev.preventDefault();Engine.move(b.getAttribute('data-dir'));clearInterval(t);t=setInterval(function(){Engine.move(b.getAttribute('data-dir'));},180);}
-      function stop(){clearInterval(t);}
-      b.addEventListener('pointerdown',go);b.addEventListener('pointerup',stop);b.addEventListener('pointerleave',stop);b.addEventListener('pointercancel',stop);
-    })(btns[i]);}
-    document.getElementById('btn-a').addEventListener('click',Engine.interact);
-    document.addEventListener('gesturestart',function(e){e.preventDefault();});
-    document.addEventListener('touchmove',function(e){e.preventDefault();},{passive:false});
+// Python Quest — démarrage, contrôles clavier et tactiles
+window.PQ = window.PQ || {};
+window.addEventListener('error', function (e) {
+  document.getElementById('error').textContent = 'Erreur : ' + e.message;
+});
+(function () {
+  'use strict';
+  function start() {
+    PQ.ui.init();
+    PQ.engine.render();
   }
-  function start(){
-    State.load();
-    I18n.load(State.data.lang||'fr').then(function(){
-      UI.init();
-      document.getElementById('app').hidden=false;
-      Engine.init();bindControls();
-      document.getElementById('loading').hidden=true;
-      window.__ready=true;
+  document.addEventListener('DOMContentLoaded', function () {
+    PQ.i18n.load(PQ.state.s.lang).then(function () { PQ.state.s.lang = PQ.lang; start(); });
+  });
+  document.addEventListener('keydown', function (e) {
+    var k = e.key.toLowerCase();
+    if (PQ.ui.isOpen()) {
+      if (k === 'a' || k === 'enter' || k === ' ' || k === 'e') { document.getElementById('dialog-ok').click(); }
+      return;
+    }
+    if (k === 'arrowup' || k === 'w' || k === 'z') PQ.engine.tryMove(0, -1);
+    else if (k === 'arrowdown' || k === 's') PQ.engine.tryMove(0, 1);
+    else if (k === 'arrowleft' || k === 'a' || k === 'q') PQ.engine.tryMove(-1, 0);
+    else if (k === 'arrowright' || k === 'd') PQ.engine.tryMove(1, 0);
+    else if (k === 'a' || k === 'enter' || k === ' ' || k === 'e') PQ.engine.action();
+  });
+  document.querySelectorAll('#touch button[data-dir]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var d = b.getAttribute('data-dir');
+      if (d === 'up') PQ.engine.tryMove(0, -1);
+      if (d === 'down') PQ.engine.tryMove(0, 1);
+      if (d === 'left') PQ.engine.tryMove(-1, 0);
+      if (d === 'right') PQ.engine.tryMove(1, 0);
     });
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+  });
+  document.getElementById('touch-act').addEventListener('click', function () {
+    if (PQ.ui.isOpen()) document.getElementById('dialog-ok').click(); else PQ.engine.action();
+  });
 })();

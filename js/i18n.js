@@ -1,20 +1,24 @@
-(function(){
-  var fr={},cur={};
-  var I18n={
-    lang:'fr',
-    load:function(lang){
-      var base=fetch('i18n/fr.json').then(function(r){return r.json();}).then(function(j){fr=j;});
-      return base.then(function(){
-        if(lang==='fr'){cur={};return;}
-        return fetch('i18n/'+lang+'.json').then(function(r){return r.json();}).then(function(j){cur=j;}).catch(function(){cur={};});
-      }).then(function(){I18n.lang=lang;});
-    },
-    t:function(key){
-      if(cur[key]!==undefined)return cur[key];
-      if(fr[key]!==undefined)return fr[key];
-      return key;
-    },
-    has:function(key){return fr[key]!==undefined;}
-  };
-  window.I18n=I18n;
+// Python Quest — internationalisation (fr = repli)
+window.PQ = window.PQ || {};
+PQ.i18n = (function () {
+  'use strict';
+  let dict = {};
+  const FALLBACK = 'fr';
+  async function load(lang) {
+    try { dict = await (await fetch('i18n/' + lang + '.json')).json(); } catch (e) { /* fallback */ }
+    if (lang !== FALLBACK) {
+      try {
+        const fb = await (await fetch('i18n/' + FALLBACK + '.json')).json();
+        dict = Object.assign({}, fb, dict);
+      } catch (e) { dict = {}; }
+    }
+    const nav = (navigator.language || 'fr').slice(0, 2).toLowerCase();
+    PQ.lang = (['fr', 'en', 'de'].indexOf(lang) !== -1) ? lang : nav;
+  }
+  function t(key, vars) {
+    let s = dict[key] || key;
+    if (vars) Object.keys(vars).forEach(function (k) { s = s.split('{' + k + '}').join(String(vars[k])); });
+    return s;
+  }
+  return { load: load, t: t };
 })();

@@ -1,13 +1,18 @@
-(function(){
-  var KEY='pyquest_save_v1';
-  function fresh(){return {map:'village',x:5,y:6,gold:20,xp:0,lvl:1,hp:30,maxHp:30,inventory:{},quests:{},chests:{},riddles:{},bosses:{},lang:'fr',theme:'dark'};}
-  var State={
-    data:fresh(),
-    save:function(){try{localStorage.setItem(KEY,JSON.stringify(State.data));}catch(e){}},
-    load:function(){try{var s=localStorage.getItem(KEY);if(s){State.data=Object.assign(fresh(),JSON.parse(s));}}catch(e){State.data=fresh();}},
-    exportCode:function(){return btoa(unescape(encodeURIComponent(JSON.stringify(State.data))));},
-    importCode:function(code){State.data=Object.assign(fresh(),JSON.parse(decodeURIComponent(escape(atob(code)))));State.save();},
-    reset:function(){State.data=fresh();State.save();}
+// Python Quest — état du joueur + sauvegarde localStorage
+window.PQ = window.PQ || {};
+PQ.state = (function () {
+  'use strict';
+  const KEY = 'pythonquest.save';
+  const def = function () {
+    return { map: 'village', x: 5, y: 5, hp: 50, maxHp: 50, gold: 10, xp: 0, level: 1,
+      dmg: 8, items: { potion: 1 }, spells: [], seen: {}, lang: null };
   };
-  window.State=State;
+  let s = def();
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) s = Object.assign(def(), JSON.parse(raw));
+  } catch (e) { /* fresh game */ }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+  function reset() { s = def(); save(); return s; }
+  return { get s() { return s; }, save: save, reset: reset };
 })();
