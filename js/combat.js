@@ -26,7 +26,8 @@ PQ.combat = (function () {
               PQ.ui.dialog(t('combat.correct', { d: s.dmg }) + '\n\n' + q.expl, function () {
                 if (ehp <= 0) return win();
                 enemyStrike();
-              });n            } else {
+              });
+            } else {
               s.hp -= 3;
               PQ.ui.dialog(t('combat.wrong', { d: 3 }) + '\n\n' + q.expl, function () {
                 if (s.hp <= 0) return dead();
