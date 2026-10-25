@@ -1,0 +1,12 @@
+{
+  "loading": "Chargement…",
+  "map.village": "Village d'Initia",
+  "hud.gold": "Or",
+  "hud.hp": "PV",
+  "hud.lvl": "Niv",
+  "ok": "OK",
+  "npc.mentor.name": "Maître Alder",
+  "npc.mentor.1": "Bienvenue à Initia, apprenti mage ! Ici, la magie s'appelle Python.",
+  "npc.mentor.2": "Une variable est une boîte qui porte un nom : age = 12. Pas de type à déclarer, contrairement à Java ou C++.",
+  "sign.village": "Village d'Initia — la forêt des Murmures est à l'est."
+}

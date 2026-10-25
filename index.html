@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#14101f">
+<link rel="manifest" href="manifest.json">
+<title>Python Quest</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="loading"><div class="spinner"></div><p id="loading-text">Chargement…</p></div>
+<div id="error-screen" hidden><h2>Erreur</h2><pre id="error-text"></pre></div>
+<div id="app" hidden>
+  <div id="hud"><span id="hud-map"></span><span id="hud-stats"></span></div>
+  <canvas id="world"></canvas>
+  <div id="dialog" hidden><div id="dialog-name"></div><div id="dialog-text"></div><button id="dialog-ok" type="button">OK</button></div>
+  <div id="controls">
+    <div id="dpad">
+      <button data-dir="up" type="button" aria-label="Haut">▲</button>
+      <button data-dir="left" type="button" aria-label="Gauche">◀</button>
+      <button data-dir="right" type="button" aria-label="Droite">▶</button>
+      <button data-dir="down" type="button" aria-label="Bas">▼</button>
+    </div>
+    <div id="actions">
+      <button id="btn-b" type="button">B</button>
+      <button id="btn-a" type="button">A</button>
+    </div>
+  </div>
+</div>
+<script>
+window.onerror=function(m,s,l,c,e){var el=document.getElementById('error-screen');document.getElementById('error-text').textContent=m+'\n'+s+':'+l+':'+c+'\n'+(e&&e.stack?e.stack:'');el.hidden=false;};
+window.addEventListener('unhandledrejection',function(ev){window.onerror('Promise: '+(ev.reason&&ev.reason.message||ev.reason),'',0,0,ev.reason);});
+</script>
+<script src="js/i18n.js"></script>
+<script src="js/state.js"></script>
+<script src="js/data-maps.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

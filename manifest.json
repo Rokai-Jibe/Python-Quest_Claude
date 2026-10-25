@@ -1,0 +1,8 @@
+{
+  "name": "Python Quest",
+  "short_name": "PyQuest",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#14101f",
+  "theme_color": "#14101f"
+}
