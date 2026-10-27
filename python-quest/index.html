@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#1b1f2a">
+<title>Python Quest</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <header id="hud">
+    <span id="hud-map"></span>
+    <span id="hud-hp"></span>
+    <span id="hud-gold"></span>
+  </header>
+  <pre id="screen" aria-label="carte"></pre>
+  <div id="dialog" class="hidden"><p id="dialog-text"></p><button id="dialog-ok">OK</button></div>
+  <div id="menu" class="hidden"></div>
+  <div id="touch">
+    <button data-dir="up">&#8593;</button>
+    <div><button data-dir="left">&#8592;</button><button data-dir="down">&#8595;</button><button data-dir="right">&#8594;</button></div>
+    <button id="touch-act">A</button>
+  </div>
+  <p id="error"></p>
+</div>
+<script src="js/i18n.js"></script>
+<script src="js/state.js"></script>
+<script src="js/data-maps.js"></script>
+<script src="js/data-content.js"></script>
+<script src="js/pyrunner.js"></script>
+<script src="js/battle.js"></script>
+<script src="js/dungeon.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+</body>
+</html>
