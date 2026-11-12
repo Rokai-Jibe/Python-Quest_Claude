@@ -1,10 +1,1 @@
-{
-  "name": "Python Quest",
-  "short_name": "PyQuest",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#0f1116",
-  "theme_color": "#1b1f2a",
-  "description": "Jeu-aventure pédagogique pour apprendre Python.",
-  "icons": []
-}
+{ "name": "Python Quest", "short_name": "PyQuest", "start_url": ".", "display": "standalone", "background_color": "#14102b", "theme_color": "#14102b" }
